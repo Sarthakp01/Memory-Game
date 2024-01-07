@@ -1,0 +1,21 @@
+// :host {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     height: 100vh;
+//   }
+
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 150px);
+    gap: 50px;
+  
+    justify-content: center;
+  }
+  
+  @media (max-width: 600px) {
+    .grid {
+      grid-template-columns: repeat(2, 150px);
+    }
+  }
