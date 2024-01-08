@@ -1,23 +1,5 @@
 <!-- 
 <div class="p-16" style="background-color: azure;">
-    
-    <div class="grid p-16">
-      <app-game-card
-        *ngFor="let c of cards; let idx=index"
-        [data]="c"
-        (cardClicked)="cardClicked(idx)"
-      >
-      </app-game-card>
-    </div>
-    <div *ngIf="matchedCount === cardImages.length">
-        <p>Total Clicks: {{ totalClicks }}</p>
-        <p>Moves: {{ moves }}</p>
-        <p>Misses: {{ misses }}</p>
-        <p>Accuracy: {{ (matchedCount / totalClicks * 100).toFixed(2) }}%</p>
-      </div>
-</div> -->
-
-<div class="p-16" style="background-color: azure;">
   <div class="result-container centered-container">
     <div *ngIf="matchedCount === cardImages.length; else elseBlock">
       <div class="result-content">
@@ -41,4 +23,40 @@
       </div>
     </div>
 </ng-template>
+</div> -->
+
+
+
+<div class="p-16" style="background-color: azure;">
+  <div class="result-container centered-container">
+    <div *ngIf="matchedCount === cardImages.length; else elseBlock">
+      <div class="result-content">
+        <p>Total Clicks: {{ totalClicks }}</p>
+        <p>Moves: {{ moves / 2 }}</p>
+        <p>Misses: {{ (moves / 2) - 6 }}</p>
+        <p>Accuracy: {{ ((6 / (totalClicks / 2)) * 100).toFixed(2) }}%</p>
+        <div class="button-container">
+          <button class="button" (click)="continue()">Continue</button>
+          <button class="button" (click)="replay()">Restart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="level-container">
+    <p>Level: {{ level }}</p>
+  </div>
+
+  <ng-template #elseBlock>
+    <div id="score">
+      <div class="grid p-16">
+        <app-game-card
+          *ngFor="let c of cards; let idx=index"
+          [data]="c"
+          (cardClicked)="cardClicked(idx)"
+        >
+        </app-game-card>
+      </div>
+    </div>
+  </ng-template>
 </div>

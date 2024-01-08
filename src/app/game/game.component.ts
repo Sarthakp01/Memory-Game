@@ -1,26 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CardData } from '../cardData';
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
-  styleUrl: './game.component.scss'
+  styleUrls: ['./game.component.scss']
 })
-export class GameComponent {
+export class GameComponent implements OnInit, OnDestroy {
   title = 'MemoryGame';
-  cardImages = [
-    'dog',
-    'cat',
-    'sheep'
-  ];
+  cardImages = ['dog', 'cat', 'sheep'];
 
   cards: CardData[] = [];
-
   flippedCards: CardData[] = [];
-
   matchedCount = 0;
+
+  totalClicks = 0;
+  moves = 0;
+  misses = 0;
+
+  level = 1;
+  rotateTime = 1000; // Initial rotation time in milliseconds
+
   ngOnInit(): void {
+    this.loadGameState();
     this.setupCards();
+    this.loadFlippedCards(); // Load flipped cards for continued game
+  }
+
+  ngOnDestroy(): void {
+    this.saveGameState();
   }
 
   setupCards(): void {
@@ -33,32 +41,23 @@ export class GameComponent {
 
       this.cards.push({ ...cardData });
       this.cards.push({ ...cardData });
-
     });
 
     this.cards = this.shuffleArray(this.cards);
-}
-  shuffleArray(cards: CardData[]): CardData[] {
-    let currentIndex = this.cards.length,  randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex != 0) {
-  
-      // Pick a remaining element.
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-  
-      // And swap it with the current element.
-      [this.cards[currentIndex], this.cards[randomIndex]] = [
-        this.cards[randomIndex], this.cards[currentIndex]];
-    }
-  
-    return this.cards;
   }
 
-  totalClicks = 0;
-  moves = 0;
-  misses = 0;
+  shuffleArray(cards: CardData[]): CardData[] {
+    let currentIndex = cards.length, randomIndex;
+
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      [cards[currentIndex], cards[randomIndex]] = [cards[randomIndex], cards[currentIndex]];
+    }
+
+    return cards;
+  }
 
   cardClicked(index: number): void {
     const cardInfo = this.cards[index];
@@ -72,19 +71,17 @@ export class GameComponent {
       }
 
       this.moves++;
-      this.totalClicks++; 
+      this.totalClicks++;
     } else if (cardInfo.state === 'flipped') {
       cardInfo.state = 'default';
       this.flippedCards.pop();
-      this.misses++; 
+      this.misses++;
     }
   }
 
-
   checkForCardMatch(): void {
     setTimeout(() => {
-      const cardOne = this.flippedCards[0];
-      const cardTwo = this.flippedCards[1];
+      const [cardOne, cardTwo] = this.flippedCards;
       const nextState = cardOne.imageId === cardTwo.imageId ? 'matched' : 'default';
       cardOne.state = cardTwo.state = nextState;
 
@@ -93,6 +90,71 @@ export class GameComponent {
       if (nextState === 'matched') {
         this.matchedCount++;
       }
-    }, 1000);
+    }, this.rotateTime);
+  }
+
+  replay(): void {
+    this.level = 1;
+    this.matchedCount = 0;
+    this.moves = 0;
+    this.misses = 0;
+    this.totalClicks = 0;
+    this.setupCards();
+  }
+
+  continue(): void {
+    this.level++;
+    this.rotateTime = this.rotateTime > 200 ? this.rotateTime - 100 : 200; // Decrease rotation time up to a minimum of 200ms
+    this.matchedCount = 0;
+    this.moves = 0;
+    this.misses = 0;
+    this.totalClicks = 0;
+    this.setupCards();
+  }
+
+  restart(): void {
+    this.level = 1;
+    this.matchedCount = 0;
+    this.moves = 0;
+    this.misses = 0;
+    this.totalClicks = 0;
+    this.setupCards();
+  }
+
+  saveGameState(): void {
+    localStorage.setItem('gameState', JSON.stringify({
+      level: this.level,
+      rotateTime: this.rotateTime,
+      cards: this.cards,
+      totalClicks: this.totalClicks,
+      moves: this.moves,
+      misses: this.misses,
+      matchedCount: this.matchedCount,
+      flippedCards: this.flippedCards
+    }));
+  }
+
+  loadGameState(): void {
+    const savedState = localStorage.getItem('gameState');
+    if (savedState) {
+      const gameState = JSON.parse(savedState);
+      this.level = gameState.level;
+      this.rotateTime = gameState.rotateTime;
+      this.cards = gameState.cards;
+      this.totalClicks = gameState.totalClicks;
+      this.moves = gameState.moves;
+      this.misses = gameState.misses;
+      this.matchedCount = gameState.matchedCount;
+      this.flippedCards = gameState.flippedCards || [];
+    }
+  }
+
+  loadFlippedCards(): void {
+    this.flippedCards.forEach(({ imageId }) => {
+      const cardIndex = this.cards.findIndex(card => card.imageId === imageId);
+      if (cardIndex !== -1) {
+        this.cards[cardIndex].state = 'flipped';
+      }
+    });
   }
 }
