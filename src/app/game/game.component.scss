@@ -19,3 +19,24 @@
       grid-template-columns: repeat(2, 150px);
     }
   }
+
+  .centered-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 100vh; /* Adjust as needed */
+  }
+  
+  .result-container {
+    background-color: #f2f2f2;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .result-content {
+    text-align: center;
+    color: #333;
+    font-size: 18px;
+  }
+  

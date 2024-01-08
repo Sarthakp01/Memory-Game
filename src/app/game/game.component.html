@@ -1,13 +1,16 @@
 
 <div class="p-16" style="background-color: azure;">
+  <div class="result-container centered-container">
     <div *ngIf="matchedCount === cardImages.length; else elseBlock">
-        <div>
-            <p>Total Clicks: {{ totalClicks }}</p>
-            <p>Moves: {{ moves/2 }}</p>
-            <p>Misses: {{ (moves/2) - 3 }}</p>
-            <p>Accuracy: {{ ((3 / (totalClicks/2)) * 100).toFixed(2) }}%</p>
-          </div>
+      <div class="result-content">
+        <p>Total Clicks: {{ totalClicks }}</p>
+        <p>Moves: {{ moves / 2 }}</p>
+        <p>Misses: {{ (moves / 2) - 3 }}</p>
+        <p>Accuracy: {{ ((3 / (totalClicks / 2)) * 100).toFixed(2) }}%</p>
+      </div>
     </div>
+  </div>
+  
     <ng-template #elseBlock>
         <div id="score">
         <div class="grid p-16">
